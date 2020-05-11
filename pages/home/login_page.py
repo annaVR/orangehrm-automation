@@ -1,29 +1,27 @@
-from selenium import webdriver
-from selenium.webdriver. common.by import By
 import time
-from base.selenium_driver import SeleniumDriver
-import unilities.custom_logger as cl
+from base.base_page import BasePage
+import utilities.custom_logger as cl
 import logging
 
 
-class LoginPage(SeleniumDriver):
+class LoginPage(BasePage):
 
+    #getting the log in this class, so the name of the class will show up in logs
     log = cl.CustomLogger(logging.DEBUG)
-    # TODO: need to pass log instance from LoginPage to SeleniumDriver and remove log instance in SeleniumDriver itself
 
     def __init__(self, driver):
         super().__init__(driver)  # calling the __init__ method of the super class (Selenium Driver) and providing the driver to it
         self.driver = driver
 
     # Locators letscodeit
-    _login_link = "Login"
-    _email_field = 'user_email'
-    _password_field = "user_password"
-    _login_button = "commit"
+    _login_link = "Login" #locator: link
+    _email_field = 'user_email'#locator: id
+    _password_field = "user_password" #locator: id
+    _login_button = "commit" #locator: name
     # Locators orangehrm
-    _username_field_hrm = "//div[@id='divUsername']/input[@id='txtUsername']"
-    _password_field_hrm = "txtPassword"
-    _login_button_hrm = "btnLogin"
+    _username_field_hrm = "//div[@id='divUsername']/input[@id='txtUsername']" #locator: xpath
+    _password_field_hrm = "txtPassword" #locator: id
+    _login_button_hrm = "btnLogin" #locator: id
 
     # Elements actions
     # letscodit
@@ -63,7 +61,7 @@ class LoginPage(SeleniumDriver):
     def go_to_login_page(self):
         self.click_login_link()
 
-    def login(self, email='', password=''):
+    def login(self, email='', password=''): #parameters are optional e.g. for testing empty credentials
         self.clear_email()
         self.enter_email(email)
         self.enter_password(password)
@@ -73,13 +71,17 @@ class LoginPage(SeleniumDriver):
         result = self.is_element_present(self._login_button, locator_type="name")
         return result
 
-    def verify_login_successfull(self):
-        result = self.is_element_present("//div[@id='navbar']//span[text()='Test User'", locator_type='xpath')
+    def verify_login_successful(self):
+        result = self.is_element_present("//div[@id='navbar']//li[@class='dropdown']", locator_type="xpath")
         return result # returns boolean
 
     def verify_login_failed(self):
         result = self.is_element_present("//div[contains(text(), 'Invalid email or password')]", locator_type="xpath")
         return result
+
+    def verify_login_title(self):
+        return self.verify_page_title(expected_title="Let's Kode") #intentionally given wrong title to fail TC
+
     # hrm
     def login_hrm(self, username='', password=''):
         self.clear_username_hrm()
@@ -98,6 +100,11 @@ class LoginPage(SeleniumDriver):
         result = self.is_element_present("//div//span[text()='Invalid credentials']", locator_type="xpath")
         return result
 
+    def verify_empty_username_login_failed_hrm(self):
+        result = self.is_element_present("//div[@id='divLoginButton']//span[text()='Username cannot be empty']", locator_type="xpath")
+        return result
 
-# 2. why log is not printing
+    def verify_login_title_hrm(self):
+        return self.verify_page_title(expected_title="OrangeHRM")
+
 # 4. observe recent changed and remove that is not needed
