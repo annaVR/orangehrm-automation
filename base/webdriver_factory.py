@@ -32,7 +32,12 @@ class WebDriverFactory():
         if self.browser == "Firefox":
             driver = webdriver.Firefox()
         else:
-            driver = webdriver.Chrome()
+            #captcha workaround 2 next lines of code
+            #chrome://version/
+            #on the first run - fillout captcha manually and then quit the browser,on next runs,captcha should disappear
+            opt = webdriver.ChromeOptions()
+            opt.add_argument("user-data-dir=/Users/annaromanovskaia/Library/Application Support/Google/Chrome/Default")
+            driver = webdriver.Chrome(options=opt)
 
         driver.implicitly_wait(3)
         driver.maximize_window()

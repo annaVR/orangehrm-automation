@@ -1,5 +1,6 @@
 import time
 from base.base_page import BasePage
+from pages.home.navigation_page import NavigationPage
 import utilities.custom_logger as cl
 import logging
 
@@ -12,12 +13,14 @@ class LoginPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)  # calling the __init__ method of the super class (Selenium Driver) and providing the driver to it
         self.driver = driver
+        self.navigation = NavigationPage(self.driver)
 
     # Locators letscodeit
     _login_link = "Login" #locator: link
     _email_field = 'user_email'#locator: id
     _password_field = "user_password" #locator: id
     _login_button = "commit" #locator: name
+
     # Locators orangehrm
     _username_field_hrm = "//div[@id='divUsername']/input[@id='txtUsername']" #locator: xpath
     _password_field_hrm = "txtPassword" #locator: id
@@ -80,7 +83,13 @@ class LoginPage(BasePage):
         return result
 
     def verify_login_title(self):
-        return self.verify_page_title(expected_title="Let's Kode") #intentionally given wrong title to fail TC
+        return self.verify_page_title(expected_title="Let's Kode")
+
+    def logout(self):
+        self.navigation.navigate_profile_icon()
+        element = self.wait_for_element(locator='//div//a[@href="/sign_out"]', locator_type='xpath', pollFrequency=1)
+        self.element_click(element=element)
+
 
     # hrm
     def login_hrm(self, username='', password=''):
@@ -107,4 +116,6 @@ class LoginPage(BasePage):
     def verify_login_title_hrm(self):
         return self.verify_page_title(expected_title="OrangeHRM")
 
+    def logout_hrm(self):
+        self.navigation.logout()
 # 4. observe recent changed and remove that is not needed

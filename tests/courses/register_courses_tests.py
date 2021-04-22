@@ -3,7 +3,8 @@ from utilities.tc_status import TCaseStatus
 import unittest
 import pytest
 import time
-
+#the NavigationPage test in logs fails    when running test second and following time,
+# because user already logged
 @pytest.mark.usefixtures("module_set_up_level_to_test_a_class", "method_set_up")
 class RegisterCoursesTests(unittest.TestCase):
 
@@ -22,16 +23,16 @@ class RegisterCoursesTests(unittest.TestCase):
         time.sleep(4)
 
     @pytest.mark.run(order=2)
-    def test_verify_enroll_button_final_disabled_with_invalid_card(self):
+    def test_verify_buy_now_button_disabled_with_invalid_card(self):
         self.register_courses.enroll_in_course_from_course_details_page()
         result = self.register_courses.verify_redirected_to_checkout_page()
         self.test_status.mark(result, "Redirected to Checkout Page Verification")
-        self.register_courses.enter_card_details_postal_code(cc_number="5555", exp_date="03/19",
-                                                             cvc="12", postal_code="93405")
-        result2 = self.register_courses.verify_enroll_button_final_disabled()
-        self.test_status.mark_final("Test Case Name: test_verify_enroll_button_final_disabled_with_invalid_card",
-                              result2, "Enroll Button Final Disabled Verification")
+        self.register_courses.enter_another_card_details_postal_code(cc_number="5555", exp_date="03/22",
+                                                             cvc="123", postal_code="93405")
+        result2 = self.register_courses.verify_buy_now_button_disabled()
+        print("Result2: {}".format(result))
         time.sleep(3)
 
-    @pytest.mark.run(order=3)
-    #def test_verify_enroll_button_enabled_with_valid_cc_and_terms_of_use(self):
+        self.test_status.mark_final("Test Case Name: test_verify_buy_now_button_disabled_with_invalid_card",
+                              result2, "Buy Now Disabled Verification")
+        time.sleep(3)

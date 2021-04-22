@@ -76,6 +76,7 @@ class SeleniumDriver():
         try:
             by_type = self.get_by_type(locator_type)
             element = self.driver.find_element(by_type, locator)
+
             self.log.info("Element Found with locator '{}' and locator_type '{}'".format(locator, locator_type))
         except:
             self.log.error("Element not found with locator '{}' and locator_type '{}'".format(locator, locator_type))
@@ -155,6 +156,9 @@ class SeleniumDriver():
         NEW METHOD
         Get 'Text' on an element
         Either provide element or a combination of locator and locator_type conbination
+        "info" optional argument: need to pass the value in the Page class file - in the needed funtion:
+        provide Name of the element to insert in log message, so you can identify which element it is
+
         """
         try:
             if locator:  # This means if locator is not empty
@@ -297,13 +301,12 @@ class SeleniumDriver():
             self.log.info("Waiting for maximum :: " + str(timeout) +
                   " :: seconds for element to be clickable")
             wait = WebDriverWait(self.driver, timeout=timeout, poll_frequency=pollFrequency,
-                                 ignored_exceptions=[NoSuchElementException,
-                                                     ElementNotVisibleException,
+                                 ignored_exceptions=[NoSuchElementException, ElementNotVisibleException,
                                                      ElementNotSelectableException])
             element = wait.until(EC.element_to_be_clickable((by_type, locator)))
-            self.log.info("Element appeared on the web page")
+            self.log.info("Element with locator:{} and locator_type:{} appeared on the web page".format(locator, locator_type))
         except:
-            self.log.error("Element not appeared on the web page")
+            self.log.error("Element with locator:{} and locator_type:{} not appeared on the web page".format(locator, locator_type))
             print_stack()
         return element
 
@@ -319,7 +322,41 @@ class SeleniumDriver():
             # Scroll Down
             self.driver.execute_script("window.scrollBy(0, 1000);")
 
-#did not checked the logic for the following methods:
+    #did not check the logic for the following method (#193)
+    def switch_frame_by_index(self, locator, locator_type="xpath"):
+
+        """
+        Get iframe index using element locator inside iframe
+
+        Parameters:
+            1. Required:
+                locator   - Locator of the element
+            2. Optional:
+                locatorType - Locator Type to find the element
+        Returns:
+            Index of iframe
+        Exception:
+            None
+        """
+        result = False
+        try:
+            iframe_list = self.get_elements_list("//iframe", locator_type="xpath")
+            self.log.info("Length of iframe list: ")
+            self.log.info(str(len(iframe_list)))
+            for i in range(len(iframe_list)):
+                self.switch_to_frame(index=iframe_list[i])
+                result = self.is_element_present(locator, locator_type)
+                if result:
+                    self.log.info("iframe index is:")
+                    self.log.info(str(i))
+                    break
+                self.switch_to_default_content()
+            return result
+        except:
+            print("iFrame index not found")
+            return result
+
+    #did not checked the logic for the following methods:
     def switch_to_frame(self, id="", name="", index=None):
         """
         Switch to iframe using element locator inside iframe
@@ -389,6 +426,8 @@ class SeleniumDriver():
             2. Optional:
                 1. locatorType - Type of the locator(id(default), xpath, css, className, linkText)
                 2. info - Information about the element, label/name of the element
+                "info" optional argument: need to pass the value in the Page class file - in the needed funtion:
+                provide Name of the element to insert in log message, so you can identify which element it is
         Returns:
             boolean
         Exception:
@@ -403,9 +442,9 @@ class SeleniumDriver():
             else: #wrinting this else because ._is_enabled() Selenium built-in method works only if
                 # there is an attribute 'disabled' specified in the element
                 # in our case it does not exist, instead the word disabled specified in class name
-                value = self.get_element_attribute_value(element=element, attribute="class")
-                self.log.info("Attribute value From Application Web UI {}".format(value))
-                enabled = not ("disabled" in value)
+                class_attribute_value = self.get_element_attribute_value(element=element, attribute="class")
+                self.log.info("Attribute value From Application Web UI {}".format(class_attribute_value))
+                enabled = not ("is-disabled" in class_attribute_value)
             if enabled:
                 self.log.info("Element {} is enabled".format(info))
             else:

@@ -40,6 +40,9 @@ def method_set_up(): #scope = function(method)
 #     print('Module teardown')
 
 #for letskodit
+#login_test will not work because they test login itself but login already completed because of the module setup
+# below includes login
+
 @pytest.fixture(scope='class')
 def module_set_up_level_to_test_a_class(request, browser): # this is One time setup
     print('Module setup')
@@ -50,7 +53,7 @@ def module_set_up_level_to_test_a_class(request, browser): # this is One time se
     result = login_page.verify_redirected_to_login_page()
     #TODO add logging to this if-else: now when hitting else - printing to console
     if result:
-        login_page.login("job@kirsanova.name", "Testpw")
+        login_page.login("test@email.com", "abcabc")
     else:
         print('Result:{}: Not redirected to login page'.format(result))
     # base_url = "https://letskodeit.teachable.com"

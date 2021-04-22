@@ -22,6 +22,8 @@ class LoginTests(unittest.TestCase):
 
     @pytest.mark.run(order=1)
     def test_go_to_login_page(self):
+        # will logout in the 1st test
+        self.login_page.logout()
         self.login_page.go_to_login_page()
         result = self.login_page.verify_redirected_to_login_page()
         assert result is True

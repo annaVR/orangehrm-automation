@@ -37,6 +37,7 @@ class LoginHrmTests(unittest.TestCase):
 
     @pytest.mark.run(order=1)
     def test_invalid_login(self):
+        self.login_page.logout_hrm()
         self.login_page.login_hrm("longinvalid", "abcabcbbb")
         result = self.login_page.verify_login_failed_hrm()
         assert result is True
